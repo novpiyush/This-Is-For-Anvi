@@ -102,7 +102,6 @@
             white-space: nowrap; pointer-events: none; border: 1px solid rgba(255,255,255,0.1);
         }
         #toast.show { transform: translate(-50%, 0); opacity: 1; }
-
         /* === CSS OBJECTS === */
         .interactive-item { cursor: pointer; transition: transform 0.2s; display: flex; flex-direction: column; align-items: center; gap: 10px; }
         .item-label { font-size: 0.9rem; color: #374151; font-weight: 600; background: rgba(255,255,255,0.7); padding: 5px 12px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
@@ -178,7 +177,6 @@
             { type: 'play', mode: 'bomb', time: 20, title: 'Color Blast', desc: 'Tap the screen for a massive explosion! Colors will stick until the water washes them.' },
             { type: 'end', title: 'Stay Happy Forever', desc: 'I sincerely wish your life remains as beautiful and colorful as these moments. Happy Holi!' }
         ];
-
         let currentIdx = 0; let consumedCounts = {}; let isCanvasActive = false; let drawMode = 'none';
         let activeTimer = null; let isFireworksActive = false; let fireworksTimer = null; let isWashing = false; let washHeight = 0;
         
@@ -187,8 +185,14 @@
         const centerStage = document.getElementById('center-stage'); const toast = document.getElementById('toast');
         const canvas = document.getElementById('canvas-layer'); const ctx = canvas.getContext('2d');
 
-        // === PREMIUM AUDIO ENGINE (Web Audio API) ===
+        // === PREMIUM AUDIO ENGINE (Web Audio API & Background Music) ===
         let audioCtx;
+        
+        // Background Music Setup
+        let bgMusic = new Audio('dj-song.mp3');
+        bgMusic.loop = true;
+        bgMusic.volume = 0.5; // Slightly lowered to ensure your custom SFX remain loud and clear
+
         function initAudio() {
             if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             if(audioCtx.state === 'suspended') audioCtx.resume();
@@ -197,7 +201,7 @@
         document.body.addEventListener('click', initAudio, { once: true });
 
         function playClickSound() {
-                  initAudio(); if(!audioCtx) return; let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.04); gain.gain.setValueAtTime(0.7, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.04);
+            initAudio(); if(!audioCtx) return; let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.04); gain.gain.setValueAtTime(0.7, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.04);
             if(navigator.vibrate) navigator.vibrate(10);
         }
 
@@ -268,7 +272,6 @@
             if(!consumedCounts['balloons']) consumedCounts['balloons'] = 0; consumedCounts['balloons']++;
             if(consumedCounts['balloons'] >= 3) { showToastMessage("Splash!"); setTimeout(transitionToNext, 1200); }
         }
-
         // === CANVAS ENGINE (Colors, Washing & Fireworks) ===
         let width, height; let particles =[]; let fwRockets =[]; let fwParticles = []; const colorPalette =['#ec4899', '#3b82f6', '#eab308', '#22c55e', '#a855f7', '#ef4444'];
         function resizeCanvas() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
@@ -285,7 +288,7 @@
                 
                 // Color Pighalkar paani me dho diye jayenge jab paani unko chhuega
                 for(let i = particles.length - 1; i >= 0; i--) { 
-                                  if (particles[i].y > height - washHeight - 20) { 
+                    if (particles[i].y > height - washHeight - 20) { 
                         particles[i].vy += 0.8; // Slide down
                         particles[i].life -= 0.08; // Wash away (Fade quickly)
                     } 
@@ -373,7 +376,18 @@
             playClickSound(); 
             let data = holiSections[currentIdx];
             if(data.type === 'intro') { transitionToNext(); } 
-            else if (data.type === 'dj') { document.getElementById('tt-1').classList.add('playing'); document.getElementById('tt-2').classList.add('playing'); btnAction.innerText = "Playing Beats..."; btnAction.style.pointerEvents = "none"; btnAction.style.opacity = "0.7"; setTimeout(transitionToNext, 3500); } 
+            else if (data.type === 'dj') { 
+                document.getElementById('tt-1').classList.add('playing'); 
+                document.getElementById('tt-2').classList.add('playing'); 
+                btnAction.innerText = "Playing Beats..."; 
+                btnAction.style.pointerEvents = "none"; 
+                btnAction.style.opacity = "0.7"; 
+                
+                // Play Background Music (Ensuring standard autoplay policies are respected inside a user click event)
+                bgMusic.play().catch(e => console.error("Audio playback error:", e));
+                
+                setTimeout(transitionToNext, 3500); 
+            } 
             else if (data.type === 'play') { canvas.style.pointerEvents = 'auto'; isCanvasActive = true; startSectionTimer(data.time); } 
             else if (data.type === 'end') { location.reload(); }
         }
@@ -393,7 +407,8 @@
             canvas.style.pointerEvents = 'none'; isCanvasActive = false; drawMode = data.mode || 'none'; consumedCounts = {}; 
             centerStage.innerHTML = data.centerHtml || ''; cardContent.innerHTML = `<h2>${data.title}</h2><p>${data.desc}</p>`;
             if(data.type === 'intro') { btnAction.innerText = "Begin Experience"; btnAction.classList.add('visible'); } 
-            else if(data.type === 'dj') { btnAction.innerText = "Start Sequence"; btnAction.classList.add('visible'); }            else if(data.type === 'play') { btnAction.innerText = "Start Playing"; btnAction.classList.add('visible'); }
+            else if(data.type === 'dj') { btnAction.innerText = "Start Sequence"; btnAction.classList.add('visible'); }
+            else if(data.type === 'play') { btnAction.innerText = "Start Playing"; btnAction.classList.add('visible'); }
             else if(data.type === 'end') { centerStage.innerHTML = ''; btnAction.innerText = "Replay Experience"; btnAction.classList.add('visible'); isFireworksActive = true; fireworksTimer = setInterval(launchFirework, 800); }
         }
 
