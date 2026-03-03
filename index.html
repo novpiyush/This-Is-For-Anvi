@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Happy Holi - Ultimate Premium</title>
+    <style>
+        /* === APPLE SF PRO FONT & SETUP === */
+        @font-face {
+            font-family: 'SF Pro Display';
+            font-style: normal;
+            font-weight: 400 800;
+            src: local('SF Pro Display'), local('Helvetica Neue'), local('Arial');
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
+        
+        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #e8f5e9; position: fixed; }
+        
+        /* === FOREST GLASS BACKGROUND === */
+        .bg-mesh {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
+            background: radial-gradient(circle at 20% 40%, rgba(16, 185, 129, 0.15), transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(52, 211, 153, 0.2), transparent 50%),
+                        radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.4), transparent 50%);
+            animation: breathe 12s infinite alternate ease-in-out;
+        }
+        @keyframes breathe { 0% { transform: scale(1); } 100% { transform: scale(1.08); } }
+
+        /* Canvas for Colors & Fireworks */
+        #canvas-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; touch-action: none; pointer-events: none; }
+
+        /* === CENTER STAGE === */
+        #center-stage {
+            position: absolute; top: 38%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 8; display: flex; justify-content: center; align-items: center; gap: 30px;
+            width: 100%; pointer-events: auto;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        #center-stage.fade-out { opacity: 0; transform: translate(-50%, -45%); pointer-events: none; }
+
+        /* === TRANSPARENT APPLE PRISM GLASS UI === */
+        .ui-container {
+            position: absolute; bottom: 45px; left: 50%; transform: translateX(-50%); width: 90%; 
+            z-index: 10; display: flex; flex-direction: column; align-items: center; pointer-events: none;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.45); 
+            backdrop-filter: blur(35px) saturate(200%); -webkit-backdrop-filter: blur(35px) saturate(200%);
+            border-radius: 36px; padding: 30px 25px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.08), inset 0 0 0 1px rgba(255,255,255,0.6);
+            text-align: center; color: #1c1c1e; width: 100%; max-width: 400px;
+            pointer-events: auto; position: relative;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            
+            transition: max-width 0.6s cubic-bezier(0.25, 1, 0.3, 1), 
+                        padding 0.6s cubic-bezier(0.25, 1, 0.3, 1),
+                        border-radius 0.6s cubic-bezier(0.25, 1, 0.3, 1),
+                        opacity 0.4s ease, transform 0.4s ease;
+        }
+        
+        .glass-card::before {
+            content: ''; position: absolute; top: -1px; left: -1px; right: -1px; bottom: -1px;
+            border-radius: inherit; z-index: -1;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.1), rgba(16,185,129,0.4), rgba(255,255,255,0.9));
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude; padding: 1px;
+            transition: border-radius 0.6s cubic-bezier(0.25, 1, 0.3, 1);
+        }
+
+        .glass-card.fade-out { opacity: 0; transform: translateY(20px); pointer-events: none; }
+        .glass-card.mini-mode { max-width: 220px; padding: 16px 20px; border-radius: 50px; }
+
+        #card-content, #btn-action { width: 100%; transition: opacity 0.3s ease; }
+        .glass-card.mini-mode #card-content, .glass-card.mini-mode #btn-action { opacity: 0; position: absolute; pointer-events: none; visibility: hidden; }
+
+        h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.5px; line-height: 1.2; background: linear-gradient(90deg, #047857, #0284c7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        p { font-size: 1.05rem; color: #374151; margin-bottom: 15px; font-weight: 500; line-height: 1.4; letter-spacing: -0.2px; }
+
+        #timer-display { opacity: 0; position: absolute; pointer-events: none; font-size: 1.15rem; font-weight: 700; letter-spacing: -0.2px; color: #047857; transition: opacity 0.4s ease; white-space: nowrap; }
+        .glass-card.mini-mode #timer-display { opacity: 1; position: relative; pointer-events: auto; transition-delay: 0.3s; }
+
+        .btn-action {
+            background: linear-gradient(135deg, #10b981, #059669); color: white; border: none;
+            padding: 14px 28px; border-radius: 30px; font-size: 1.1rem; font-weight: 600; letter-spacing: -0.3px;
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.25); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
+            display: none; width: 90%; margin: 15px auto 0;
+        }
+        .btn-action:active { transform: scale(0.94); box-shadow: 0 5px 10px rgba(16, 185, 129, 0.2); }
+        .btn-action.visible { display: block; animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        @keyframes popUp { 0%{transform:scale(0.8); opacity:0;} 100%{transform:scale(1); opacity:1;} }
+
+        /* Toast Message */
+        #toast {
+            position: absolute; top: 40px; left: 50%; transform: translate(-50%, -100px);
+            background: rgba(28, 28, 30, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); color: #fff;
+            padding: 14px 28px; border-radius: 30px; font-size: 1rem; font-weight: 500; letter-spacing: -0.2px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 100; opacity: 0; transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            white-space: nowrap; pointer-events: none; border: 1px solid rgba(255,255,255,0.1);
+        }
+        #toast.show { transform: translate(-50%, 0); opacity: 1; }
+
+        /* === CSS OBJECTS === */
+        .interactive-item { cursor: pointer; transition: transform 0.2s; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .item-label { font-size: 0.9rem; color: #374151; font-weight: 600; background: rgba(255,255,255,0.7); padding: 5px 12px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+
+        .css-gujiya, .css-ladoo, .css-rasgulla { transform-origin: center; }
+        .css-gujiya { width: 70px; height: 35px; background: linear-gradient(135deg, #fcd34d, #d97706); border-radius: 40px 40px 0 0; box-shadow: inset 0 -5px 8px rgba(0,0,0,0.2), 0 8px 15px rgba(0,0,0,0.1); position: relative; }
+        .css-gujiya::after { content: ''; position: absolute; bottom: 0; left: 8px; right: 8px; height: 5px; border-radius: 5px; background: rgba(255,255,255,0.4); }
+        .css-ladoo { width: 55px; height: 55px; background: radial-gradient(circle at 15px 15px, #fbbf24, #ea580c); border-radius: 50%; box-shadow: inset -6px -6px 12px rgba(0,0,0,0.3), 0 8px 15px rgba(0,0,0,0.1); border: 2px dashed rgba(255,255,255,0.2); }
+        .css-rasgulla { width: 55px; height: 55px; background: radial-gradient(circle at 15px 15px, #ffffff, #d1d5db); border-radius: 50%; box-shadow: inset -5px -5px 10px rgba(0,0,0,0.1), 0 8px 15px rgba(0,0,0,0.05); }
+
+        .bite-anim { animation: biteShake 0.3s ease; }
+        @keyframes biteShake { 0% { transform: scale(var(--s)) rotate(0deg); } 25% { transform: scale(var(--s)) rotate(-15deg); } 50% { transform: scale(var(--s)) rotate(15deg); } 75% { transform: scale(var(--s)) rotate(-8deg); } 100% { transform: scale(var(--s)) rotate(0deg); } }
+
+        .css-glass { width: 60px; height: 85px; border: 4px solid rgba(255,255,255,0.9); border-top: none; border-radius: 4px 4px 20px 20px; background: rgba(255,255,255,0.25); position: relative; overflow: hidden; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); transform-origin: bottom center; }
+        .css-liquid { position: absolute; bottom: 0; left: 0; width: 100%; height: 85%; transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .liq-thandai { background: linear-gradient(to bottom, #fde68a, #d97706); }
+        .liq-milk { background: linear-gradient(to bottom, #ffffff, #e5e7eb); }
+        .css-liquid::before { content: ''; position: absolute; top: -4px; left: 0; width: 100%; height: 8px; background: rgba(255,255,255,0.6); border-radius: 50%; }
+
+        .wobble-anim { animation: wobble 0.4s ease; }
+        @keyframes wobble { 0% { transform: rotate(0deg) scale(1); } 25% { transform: rotate(-10deg) scale(1.05); } 50% { transform: rotate(10deg) scale(0.95); } 75% { transform: rotate(-5deg) scale(1.02); } 100% { transform: rotate(0deg) scale(1); } }
+        .bubble { position: absolute; background: rgba(255,255,255,0.8); border-radius: 50%; bottom: 5px; animation: floatUp 0.6s ease-in forwards; pointer-events: none; z-index: 5; }
+        @keyframes floatUp { 0% { transform: translateY(0) scale(0.5); opacity: 1; } 100% { transform: translateY(-70px) scale(1.5); opacity: 0; } }
+
+        .css-balloon-container { position: relative; width: 60px; height: 80px; cursor: pointer; animation: floatBalloon 3s ease-in-out infinite alternate; transition: transform 0.1s; display: flex; flex-direction: column; align-items: center; }
+        .css-balloon-container:active { transform: scale(0.9); }
+        .css-balloon { width: 100%; height: 100%; border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; box-shadow: inset -5px -5px 15px rgba(0,0,0,0.2), 0 10px 20px rgba(0,0,0,0.1); position: relative; z-index: 2; }
+        .css-balloon::after { content:''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 8px solid currentColor; }
+        .css-string { position: absolute; bottom: -45px; left: 50%; width: 2px; height: 45px; background: rgba(0,0,0,0.4); z-index: 1; }
+        @keyframes floatBalloon { 0% { transform: translateY(8px) rotate(-4deg); } 100% { transform: translateY(-12px) rotate(4deg); } }
+
+        .css-dj-desk { width: 280px; height: 110px; background: linear-gradient(145deg, #2a2a2c, #1c1c1e); border-radius: 14px; box-shadow: 0 20px 40px rgba(0,0,0,0.3), inset 0 2px 5px rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; position: relative; border: 1px solid rgba(255,255,255,0.1); }
+        .css-turntable { width: 80px; height: 80px; background: #111; border-radius: 50%; border: 4px solid #333; display: flex; justify-content: center; align-items: center; box-shadow: inset 0 0 15px rgba(0,0,0,0.9); animation: spin 2s linear infinite; animation-play-state: paused; }
+        .css-turntable.playing { animation-play-state: running; }
+        .css-vinyl-center { width: 25px; height: 25px; background: radial-gradient(circle, #ff3b30, #c91007); border-radius: 50%; border: 2px solid #000; }
+        .css-mixer { width: 50px; height: 85px; background: #222; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-evenly; align-items: center; padding: 5px 0; border: 1px solid #444; }
+        .css-slider { width: 6px; height: 28px; background: #000; border-radius: 3px; position: relative; }
+        .css-slider::after { content: ''; position: absolute; top: 50%; left: -4px; width: 14px; height: 8px; background: #e5e5ea; border-radius: 2px; transition: top 0.2s; }
+        .css-turntable.playing ~ .css-mixer .css-slider::after { animation: slide 1s infinite alternate ease-in-out; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes slide { 0% { top: 10%; } 100% { top: 70%; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-mesh"></div>
+    <div id="toast">Notification</div>
+    
+    <canvas id="canvas-layer"></canvas>
+    <div id="center-stage"></div>
+
+    <div class="ui-container">
+        <div class="glass-card" id="ui-card">
+            <div id="card-content"></div>
+            <div id="timer-display">20 Seconds Left</div>
+            <button class="btn-action" id="btn-action" onclick="handleButtonClick()">Begin Experience</button>
+        </div>
+    </div>
+
+    <script>
+        // === ALL 11 SECTIONS DATA ===
+        const holiSections =[
+            { type: 'intro', title: 'Happy Holi', desc: 'I created this premium interactive experience just to bring a smile to your face. Let us begin!' },
+            { type: 'dj', title: 'Let The Music Play', desc: 'Holi is incomplete without beats. Tap start to load your music and begin the sequence!', centerHtml: `<div class="css-dj-desk"><div class="css-turntable" id="tt-1"><div class="css-vinyl-center"></div></div><div class="css-mixer"><div class="css-slider"></div><div class="css-slider"></div></div><div class="css-turntable" id="tt-2"><div class="css-vinyl-center" style="background: radial-gradient(circle, #0ea5e9, #0369a1);"></div></div></div>` },
+            { type: 'interact', title: 'Time For Sweets', desc: 'Tap the sweets to eat them all before moving on. Feel the crunch!', centerHtml: `<div class="interactive-item" onclick="consume('gujiya')"><div class="css-gujiya" id="gujiya" style="--s:1"></div><span class="item-label">Gujiya</span></div><div class="interactive-item" onclick="consume('ladoo')"><div class="css-ladoo" id="ladoo" style="--s:1"></div><span class="item-label">Ladoo</span></div><div class="interactive-item" onclick="consume('rasgulla')"><div class="css-rasgulla" id="rasgulla" style="--s:1"></div><span class="item-label">Rasgulla</span></div>` },
+            { type: 'interact', title: 'Refreshing Drinks', desc: 'Tap the glasses to drink up! Enjoy the refreshing feel.', centerHtml: `<div class="interactive-item" onclick="drink('thandai')"><div class="css-glass" id="glass-thandai"><div class="css-liquid liq-thandai" id="thandai"></div></div><span class="item-label">Thandai</span></div><div class="interactive-item" onclick="drink('milk')"><div class="css-glass" id="glass-milk"><div class="css-liquid liq-milk" id="milk"></div></div><span class="item-label">Milk</span></div>` },
+            { type: 'interact', title: 'Pop Balloons', desc: 'Tap on these floating balloons to blast water colors directly on the screen!', centerHtml: `<div class="css-balloon-container" id="bal-1" onclick="popBalloon('bal-1', '#ef4444')" style="animation-delay: 0s"><div class="css-balloon" style="background: radial-gradient(circle at 15px 15px, #fca5a5, #ef4444); color: #ef4444;"></div><div class="css-string"></div></div><div class="css-balloon-container" id="bal-2" onclick="popBalloon('bal-2', '#3b82f6')" style="animation-delay: 0.5s"><div class="css-balloon" style="background: radial-gradient(circle at 15px 15px, #93c5fd, #3b82f6); color: #3b82f6;"></div><div class="css-string"></div></div><div class="css-balloon-container" id="bal-3" onclick="popBalloon('bal-3', '#eab308')" style="animation-delay: 1s"><div class="css-balloon" style="background: radial-gradient(circle at 15px 15px, #fde047, #eab308); color: #eab308;"></div><div class="css-string"></div></div>` },
+            { type: 'play', mode: 'smear', time: 20, title: 'Colors Of Joy', desc: 'Smear dry colors on the screen with your finger. Tap Start to play!' },
+            { type: 'play', mode: 'neon', time: 20, title: 'Neon Glow', desc: 'Decorate the screen with bright glowing neon colors. Tap Start!' },
+            { type: 'play', mode: 'splash', time: 20, title: 'Water Splash', desc: 'Tap anywhere on the screen to splash water colors just like childhood days.' },
+            { type: 'play', mode: 'dust', time: 20, title: 'Magical Colors', desc: 'Magical colors floating in the air! Swipe your finger and watch the magic.' },
+            { type: 'play', mode: 'bomb', time: 20, title: 'Color Blast', desc: 'Tap the screen for a massive explosion! Colors will stick until the water washes them.' },
+            { type: 'end', title: 'Stay Happy Forever', desc: 'I sincerely wish your life remains as beautiful and colorful as these moments. Happy Holi!' }
+        ];
+
+        let currentIdx = 0; let consumedCounts = {}; let isCanvasActive = false; let drawMode = 'none';
+        let activeTimer = null; let isFireworksActive = false; let fireworksTimer = null; let isWashing = false; let washHeight = 0;
+        
+        const uiCard = document.getElementById('ui-card'); const cardContent = document.getElementById('card-content');
+        const btnAction = document.getElementById('btn-action'); const timerDisplay = document.getElementById('timer-display');
+        const centerStage = document.getElementById('center-stage'); const toast = document.getElementById('toast');
+        const canvas = document.getElementById('canvas-layer'); const ctx = canvas.getContext('2d');
+
+        // === PREMIUM AUDIO ENGINE (Web Audio API) ===
+        let audioCtx;
+        function initAudio() {
+            if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+        }
+        document.body.addEventListener('touchstart', initAudio, { once: true });
+        document.body.addEventListener('click', initAudio, { once: true });
+
+        function playClickSound() {
+                  initAudio(); if(!audioCtx) return; let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.04); gain.gain.setValueAtTime(0.7, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.04);
+            if(navigator.vibrate) navigator.vibrate(10);
+        }
+
+        function playBiteSound() {
+            initAudio(); if(!audioCtx) return; let time = audioCtx.currentTime;
+            let osc = audioCtx.createOscillator(); let oscGain = audioCtx.createGain(); osc.type = 'triangle'; osc.frequency.setValueAtTime(600, time); osc.frequency.exponentialRampToValueAtTime(100, time + 0.1); oscGain.gain.setValueAtTime(0.6, time); oscGain.gain.exponentialRampToValueAtTime(0.01, time + 0.1); osc.connect(oscGain); oscGain.connect(audioCtx.destination); osc.start(time); osc.stop(time + 0.1);
+            let bufferSize = audioCtx.sampleRate * 0.1; let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate); let data = buffer.getChannelData(0); for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1; let noise = audioCtx.createBufferSource(); noise.buffer = buffer; let filter = audioCtx.createBiquadFilter(); filter.type = 'highpass'; filter.frequency.value = 800; let noiseGain = audioCtx.createGain(); noiseGain.gain.setValueAtTime(0.8, time); noiseGain.gain.exponentialRampToValueAtTime(0.01, time + 0.1); noise.connect(filter); filter.connect(noiseGain); noiseGain.connect(audioCtx.destination); noise.start(time);
+        }
+
+        function playDrinkSound() {
+            initAudio(); if(!audioCtx) return; let time = audioCtx.currentTime;
+            for(let i=0; i<2; i++) { let st = time + i * 0.16; let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(350 - (i*40), st); osc.frequency.exponentialRampToValueAtTime(800 - (i*50), st + 0.05); osc.frequency.exponentialRampToValueAtTime(250, st + 0.15); gain.gain.setValueAtTime(0, st); gain.gain.linearRampToValueAtTime(0.8, st + 0.03); gain.gain.exponentialRampToValueAtTime(0.01, st + 0.15); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(st); osc.stop(st + 0.15); }
+        }
+
+        function playPopSound() {
+            initAudio(); if(!audioCtx) return; let time = audioCtx.currentTime;
+            let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain(); osc.type = 'square'; osc.frequency.setValueAtTime(500, time); osc.frequency.exponentialRampToValueAtTime(100, time + 0.1); gain.gain.setValueAtTime(0.6, time); gain.gain.exponentialRampToValueAtTime(0.01, time + 0.1); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(time); osc.stop(time + 0.1);
+        }
+
+        function playWashSound() {
+            initAudio(); if(!audioCtx) return;
+            let bufferSize = audioCtx.sampleRate * 5; let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate); let data = buffer.getChannelData(0); for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1; let noise = audioCtx.createBufferSource(); noise.buffer = buffer; let filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.setValueAtTime(150, audioCtx.currentTime); filter.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 2.5); filter.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 5); let gain = audioCtx.createGain(); gain.gain.setValueAtTime(0, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0.4, audioCtx.currentTime + 1); gain.gain.linearRampToValueAtTime(0.4, audioCtx.currentTime + 4); gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 5); noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination); noise.start();
+        }
+
+        function playFireworkLaunch() {
+            initAudio(); if(!audioCtx) return; let time = audioCtx.currentTime;
+            let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain(); osc.type = 'triangle'; osc.frequency.setValueAtTime(150, time); osc.frequency.exponentialRampToValueAtTime(600, time + 0.5); gain.gain.setValueAtTime(0, time); gain.gain.linearRampToValueAtTime(0.15, time + 0.1); gain.gain.exponentialRampToValueAtTime(0.01, time + 0.5); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(time); osc.stop(time + 0.5);
+        }
+
+        function playFireworkExplode() {
+            initAudio(); if(!audioCtx) return; let time = audioCtx.currentTime;
+            // Boom (Thud)
+            let osc = audioCtx.createOscillator(); let oscGain = audioCtx.createGain(); osc.type = 'square'; osc.frequency.setValueAtTime(150, time); osc.frequency.exponentialRampToValueAtTime(20, time + 0.3); oscGain.gain.setValueAtTime(0.8, time); oscGain.gain.exponentialRampToValueAtTime(0.01, time + 0.5); osc.connect(oscGain); oscGain.connect(audioCtx.destination); osc.start(time); osc.stop(time + 0.5);
+            // Crackle
+            let bufferSize = audioCtx.sampleRate * 0.6; let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate); let data = buffer.getChannelData(0); for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1; let noise = audioCtx.createBufferSource(); noise.buffer = buffer; let filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 2000; let noiseGain = audioCtx.createGain(); noiseGain.gain.setValueAtTime(0.8, time); noiseGain.gain.exponentialRampToValueAtTime(0.01, time + 0.6); noise.connect(filter); filter.connect(noiseGain); noiseGain.connect(audioCtx.destination); noise.start(time);
+        }
+
+        // === CENTER ITEMS INTERACTION LOGIC ===
+        function checkInteractComplete(type, req) {
+            let completed = 0; for(let key in consumedCounts) { if(consumedCounts[key] >= req) completed++; }
+            if(completed === ((type==='sweet')?3:((type==='drink')?2:3))) { showToastMessage("Awesome!"); setTimeout(transitionToNext, 1200); }
+        }
+
+        window.consume = function(id) {
+            if(!consumedCounts[id]) consumedCounts[id] = 0; if(consumedCounts[id] >= 3) return; consumedCounts[id]++;
+            playBiteSound(); if(navigator.vibrate) navigator.vibrate([20, 30, 20]);
+            let target = document.getElementById(id); let scaleVal = 1 - (consumedCounts[id]*0.3); target.style.setProperty('--s', scaleVal);
+            target.classList.remove('bite-anim'); void target.offsetWidth; target.classList.add('bite-anim'); target.style.transform = `scale(${scaleVal})`;
+            if(consumedCounts[id] === 3) { setTimeout(() => { target.parentElement.style.opacity = '0'; target.parentElement.style.pointerEvents = 'none'; checkInteractComplete('sweet', 3); }, 300); }
+        };
+
+        window.drink = function(id) {
+            if(!consumedCounts[id]) consumedCounts[id] = 0; if(consumedCounts[id] >= 3) return; consumedCounts[id]++;
+            playDrinkSound(); if(navigator.vibrate) navigator.vibrate([15, 40, 15]);
+            let target = document.getElementById(id); let glass = document.getElementById(`glass-${id}`);
+            glass.classList.remove('wobble-anim'); void glass.offsetWidth; glass.classList.add('wobble-anim');
+            for(let i=0; i<3; i++) { let bubble = document.createElement('div'); bubble.className = 'bubble'; bubble.style.left = (15 + Math.random() * 25) + 'px'; bubble.style.width = (4 + Math.random() * 5) + 'px'; bubble.style.height = bubble.style.width; glass.appendChild(bubble); setTimeout(() => bubble.remove(), 600); }
+            target.style.height = `${85 - (consumedCounts[id]*28)}%`;
+            if(consumedCounts[id] === 3) { setTimeout(() => { target.parentElement.parentElement.style.opacity = '0.5'; target.parentElement.parentElement.style.pointerEvents = 'none'; checkInteractComplete('drink', 3); }, 500); }
+        };
+
+        window.popBalloon = function(id, color) {
+            let target = document.getElementById(id); if(!target || target.style.opacity === '0') return;
+            playPopSound(); if(navigator.vibrate) navigator.vibrate([30, 50, 30]);
+            let rect = target.getBoundingClientRect(); let x = rect.left + rect.width / 2; let y = rect.top + rect.height / 2;
+            target.style.opacity = '0'; target.style.pointerEvents = 'none'; target.style.transform = 'scale(0)';
+            for(let i=0; i<40; i++) { let angle = Math.random() * Math.PI * 2; let speed = Math.random() * 15 + 2; particles.push({ x: x, y: y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, size: Math.random()*20+5, color: color, life: 1, decay: 0.015 }); }
+            if(!consumedCounts['balloons']) consumedCounts['balloons'] = 0; consumedCounts['balloons']++;
+            if(consumedCounts['balloons'] >= 3) { showToastMessage("Splash!"); setTimeout(transitionToNext, 1200); }
+        }
+
+        // === CANVAS ENGINE (Colors, Washing & Fireworks) ===
+        let width, height; let particles =[]; let fwRockets =[]; let fwParticles = []; const colorPalette =['#ec4899', '#3b82f6', '#eab308', '#22c55e', '#a855f7', '#ef4444'];
+        function resizeCanvas() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+        function drawLoop() {
+            if (drawMode !== 'none' && !isFireworksActive && !isWashing) ctx.clearRect(0,0,width,height);
+            
+            // Premium Wave Wash Animation: Dho Kar Saaf Karna
+            if (isWashing) {
+                ctx.clearRect(0,0,width,height); washHeight += (height / 280); if(washHeight > height) washHeight = height;
+                ctx.fillStyle = 'rgba(14, 165, 233, 0.9)'; ctx.beginPath(); ctx.moveTo(0, height); ctx.lineTo(0, height - washHeight);
+                let waveTime = Date.now() * 0.005; for(let i = 0; i <= width; i += 40) ctx.lineTo(i, height - washHeight + Math.sin(i * 0.02 + waveTime) * 15); ctx.lineTo(width, height); ctx.fill();
+                
+                // Color Pighalkar paani me dho diye jayenge jab paani unko chhuega
+                for(let i = particles.length - 1; i >= 0; i--) { 
+                                  if (particles[i].y > height - washHeight - 20) { 
+                        particles[i].vy += 0.8; // Slide down
+                        particles[i].life -= 0.08; // Wash away (Fade quickly)
+                    } 
+                }
+            }
+
+            for(let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i]; 
+                p.x += p.vx; p.y += p.vy; 
+                
+                // Friction for Colors (Taaki blast hone ke baad screen par chipak jaayein!)
+                p.vx *= 0.92;
+                p.vy *= 0.92;
+                
+                p.life -= p.decay;
+                
+                ctx.globalCompositeOperation = (drawMode === 'neon') ? 'screen' : 'source-over'; ctx.shadowBlur = (drawMode === 'neon') ? 15 : 0; ctx.shadowColor = (drawMode === 'neon') ? p.color : 'transparent';
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fillStyle = p.color; ctx.globalAlpha = Math.max(0, p.life); ctx.fill();
+                if(p.life <= 0) particles.splice(i, 1);
+            }
+            ctx.globalCompositeOperation = 'source-over'; ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+            
+            if(isFireworksActive) {
+                ctx.fillStyle = 'rgba(232, 245, 233, 0.2)'; ctx.fillRect(0, 0, width, height);
+                for (let i = fwRockets.length - 1; i >= 0; i--) { let r = fwRockets[i]; r.x += r.vx; r.y += r.vy; r.vy += 0.12; ctx.beginPath(); ctx.arc(r.x, r.y, 3, 0, Math.PI*2); ctx.fillStyle = r.color; ctx.fill(); if (r.vy >= 0 || r.y <= r.targetY) { explodeFirework(r.x, r.y, r.color); fwRockets.splice(i, 1); } }
+                for (let i = fwParticles.length - 1; i >= 0; i--) { let p = fwParticles[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.05; p.life -= p.decay; ctx.globalCompositeOperation = 'screen'; ctx.shadowBlur = 10; ctx.shadowColor = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fillStyle = p.color; ctx.globalAlpha = Math.max(0, p.life); ctx.fill(); if (p.life <= 0) fwParticles.splice(i, 1); }
+            }
+            requestAnimationFrame(drawLoop);
+        } drawLoop();
+
+        function executeDraw(x, y) {
+            if(!isCanvasActive || isWashing) return;
+            let c = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+            
+            // Bomb ke colors gayab nahi honge (Decay = 0), woh screen par paint ki tarah bane rahenge
+            let particleDecay = (drawMode === 'bomb') ? 0 : 0.015; 
+            
+            if(drawMode === 'smear') for(let i=0; i<3; i++) particles.push({x: x + (Math.random()-0.5)*40, y: y + (Math.random()-0.5)*40, vx: 0, vy: 0, size: Math.random()*25+10, color: c, life: 1, decay: particleDecay});
+            else if(drawMode === 'splash') for(let i=0; i<15; i++) particles.push({x: x + (Math.random()-0.5)*150, y: y + (Math.random()-0.5)*150, vx: 0, vy: 0, size: Math.random()*15+3, color: c, life: 1, decay: particleDecay});
+            else if(drawMode === 'neon' || drawMode === 'dust') for(let i=0; i<4; i++) particles.push({ x: x, y: y, vx: (Math.random()-0.5)*5, vy: (Math.random()-0.5)*5, size: Math.random()*8+2, color: c, life: 1, decay: particleDecay });
+            else if(drawMode === 'bomb') for(let i=0; i<40; i++) { let angle = Math.random() * Math.PI * 2; let speed = Math.random() * 12 + 4; particles.push({ x: x, y: y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, size: Math.random()*15+5, color: c, life: 1, decay: particleDecay }); }
+            
+            // Mobile ko hang hone se bachane ke liye max particles limit (Purane colors remove ho jayenge array full hone par)
+            if (particles.length > 1500) particles.splice(0, particles.length - 1500);
+        }
+
+        let isTouch = false;
+        canvas.addEventListener('mousedown', (e) => { isTouch = true; if(drawMode==='splash' || drawMode==='bomb') executeDraw(e.clientX, e.clientY); });
+        canvas.addEventListener('mousemove', (e) => { if(isTouch) executeDraw(e.clientX, e.clientY); });
+        canvas.addEventListener('mouseup', () => isTouch = false);
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); if(drawMode==='splash' || drawMode==='bomb') Array.from(e.touches).forEach(t => executeDraw(t.clientX, t.clientY)); }, {passive: false});
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); Array.from(e.touches).forEach(t => executeDraw(t.clientX, t.clientY)); }, {passive: false});
+
+        function launchFirework() { 
+            if(!isFireworksActive) return; 
+            playFireworkLaunch(); // Rocket Sound
+            let startX = 50 + Math.random() * (width - 100); let targetY = Math.random() * (height * 0.4); 
+            fwRockets.push({ x: startX, y: height, vx: (Math.random() - 0.5) * 3, vy: -Math.random() * 4 - 9, targetY: targetY, color: colorPalette[Math.floor(Math.random() * colorPalette.length)] }); 
+        }
+        function explodeFirework(x, y, color) { 
+            playFireworkExplode(); // BOOM-Crackle Sound
+            if(navigator.vibrate) navigator.vibrate([60, 40, 60]); 
+            for(let i=0; i<45; i++) { let angle = Math.random() * Math.PI * 2; let speed = Math.random() * 5 + 2; fwParticles.push({ x: x, y: y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, color: color, life: 1, decay: 0.015 + Math.random()*0.02, size: Math.random() * 3 + 1.5 }); } 
+        }
+
+        // === FLOW & UI LOGIC ===
+        function showToastMessage(msg) { toast.innerText = msg; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 3000); }
+        function startSectionTimer(seconds) {
+            uiCard.classList.add('mini-mode'); let timeLeft = seconds; timerDisplay.innerText = `${timeLeft} Seconds Left`;
+            
+            activeTimer = setInterval(() => {
+                timeLeft--; timerDisplay.innerText = isWashing ? `Cleaning Screen... ${timeLeft}s` : `${timeLeft} Seconds Left`;
+                if(timeLeft <= 0) { 
+                    let isNextEnd = (currentIdx + 1 < holiSections.length && holiSections[currentIdx + 1].type === 'end');
+                    if (isNextEnd && !isWashing) { 
+                        isWashing = true; canvas.style.pointerEvents = 'none'; isCanvasActive = false; timeLeft = 6; playWashSound(); 
+                    } else { 
+                        clearInterval(activeTimer); transitionToNext(); 
+                    } 
+                }
+            }, 1000);
+        }
+
+        function handleButtonClick() {
+            playClickSound(); 
+            let data = holiSections[currentIdx];
+            if(data.type === 'intro') { transitionToNext(); } 
+            else if (data.type === 'dj') { document.getElementById('tt-1').classList.add('playing'); document.getElementById('tt-2').classList.add('playing'); btnAction.innerText = "Playing Beats..."; btnAction.style.pointerEvents = "none"; btnAction.style.opacity = "0.7"; setTimeout(transitionToNext, 3500); } 
+            else if (data.type === 'play') { canvas.style.pointerEvents = 'auto'; isCanvasActive = true; startSectionTimer(data.time); } 
+            else if (data.type === 'end') { location.reload(); }
+        }
+
+        function transitionToNext() {
+            if(currentIdx >= holiSections.length - 1) return;
+            uiCard.classList.add('fade-out'); centerStage.classList.add('fade-out');
+            setTimeout(() => {
+                ctx.clearRect(0,0,width,height); particles =[]; drawMode = 'none'; isWashing = false; washHeight = 0; currentIdx++;
+                uiCard.classList.remove('mini-mode'); loadSection(currentIdx);
+                setTimeout(() => { uiCard.classList.remove('fade-out'); centerStage.classList.remove('fade-out'); }, 50);
+            }, 500); 
+        }
+
+        function loadSection(index) {
+            let data = holiSections[index]; clearInterval(activeTimer); btnAction.classList.remove('visible'); btnAction.style.pointerEvents = "auto"; btnAction.style.opacity = "1";
+            canvas.style.pointerEvents = 'none'; isCanvasActive = false; drawMode = data.mode || 'none'; consumedCounts = {}; 
+            centerStage.innerHTML = data.centerHtml || ''; cardContent.innerHTML = `<h2>${data.title}</h2><p>${data.desc}</p>`;
+            if(data.type === 'intro') { btnAction.innerText = "Begin Experience"; btnAction.classList.add('visible'); } 
+            else if(data.type === 'dj') { btnAction.innerText = "Start Sequence"; btnAction.classList.add('visible'); }            else if(data.type === 'play') { btnAction.innerText = "Start Playing"; btnAction.classList.add('visible'); }
+            else if(data.type === 'end') { centerStage.innerHTML = ''; btnAction.innerText = "Replay Experience"; btnAction.classList.add('visible'); isFireworksActive = true; fireworksTimer = setInterval(launchFirework, 800); }
+        }
+
+        // Initialization
+        loadSection(0);
+    </script>
+</body>
+</html>
