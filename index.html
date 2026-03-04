@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>I Made This Just For Palku</title>
+    <title>I Made This Just For Anvi</title>
     
     <!-- Premium Google Fonts for 3D Name -->
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&display=swap" rel="stylesheet">
@@ -188,7 +188,7 @@
     <script>
         // === ALL 12 SECTIONS DATA ===
         const holiSections =[
-            { type: 'intro', title: 'HAPPY HOLI PALKU', desc: 'I created this premium interactive experience just to bring a smile to your face. Let us begin!' },
+            { type: 'intro', title: 'HAPPY HOLI ANVI', desc: 'I created this premium interactive experience just to bring a smile to your face. Let us begin!' },
             { type: 'dj', title: 'Let The Music Play', desc: 'Tap start and let the music fill the air as colors gently begin to dance around you!', centerHtml: `<div class="css-dj-desk"><div class="css-turntable" id="tt-1"><div class="css-vinyl-center"></div></div><div class="css-mixer"><div class="css-slider"></div><div class="css-slider"></div></div><div class="css-turntable" id="tt-2"><div class="css-vinyl-center" style="background: radial-gradient(circle, #0ea5e9, #0369a1);"></div></div></div>` },
             { type: 'interact', title: 'Time For Sweets', desc: 'Tap the sweets to eat them all before moving on. Feel the crunch!', centerHtml: `<div class="interactive-item" onclick="consume('gujiya')"><div class="css-gujiya" id="gujiya" style="--s:1"></div><span class="item-label">Gujiya</span></div><div class="interactive-item" onclick="consume('laddu')"><div class="css-laddu" id="laddu" style="--s:1"></div><span class="item-label">Laddu</span></div><div class="interactive-item" onclick="consume('rasgulla')"><div class="css-rasgulla" id="rasgulla" style="--s:1"></div><span class="item-label">Rasgulla</span></div>` },
             { type: 'interact', title: 'Refreshing Drinks', desc: 'Tap the glasses to drink up! Enjoy the refreshing feel.', centerHtml: `<div class="interactive-item" onclick="drink('thandai')"><div class="css-glass" id="glass-thandai"><div class="css-liquid liq-thandai" id="thandai"></div></div><span class="item-label">Thandai</span></div><div class="interactive-item" onclick="drink('milk')"><div class="css-glass" id="glass-milk"><div class="css-liquid liq-milk" id="milk"></div></div><span class="item-label">Milk</span></div>` },
@@ -203,7 +203,7 @@
             { type: 'bucket', mode: 'bucket', time: 30, title: 'Magical Bucket', desc: 'Swipe up on the balloons to throw them and print your magical name!' },
             
             // ORIGINAL FINAL SECTION 
-            { type: 'end', title: 'Stay Happy Forever', desc: 'I sincerely wish your life remains as beautiful and colorful as these moments. Happy Holi Palku!' }
+            { type: 'end', title: 'Stay Happy Forever', desc: 'I sincerely wish your life remains as beautiful and colorful as these moments. Happy Holi Anvi!' }
         ];
 
         let currentIdx = 0; let consumedCounts = {}; let isCanvasActive = false; let drawMode = 'none';
@@ -337,8 +337,8 @@
         function resizeCanvas() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
         window.addEventListener('resize', resizeCanvas); resizeCanvas();
 
-        // Generates Offscreen Pixel Map for Cute Premium Name "Palku"
-        let palkuOffsets =[];
+        // Generates Offscreen Pixel Map for Cute Premium Name "Anvi"
+        let anviOffsets =[];
         function generatePalkuOffsets() {
             let offCanvas = document.createElement('canvas');
             let offCtx = offCanvas.getContext('2d');
@@ -347,12 +347,12 @@
             offCtx.fillStyle = '#fff'; offCtx.textAlign = 'center'; offCtx.textBaseline = 'middle';
             // Premium Fredoka Font via Google Fonts
             offCtx.font = `900 110px "Fredoka", "Nunito", "Arial Rounded MT Bold", sans-serif`;
-            offCtx.fillText("Palku", 200, 100);
+            offCtx.fillText("Anvi", 200, 100);
             
             let imgData = offCtx.getImageData(0, 0, 400, 200).data;
             for(let y = 0; y < 200; y += 4) {
                 for(let x = 0; x < 400; x += 4) {
-                    if(imgData[(y * 400 + x) * 4] > 128) palkuOffsets.push({ x: x - 200, y: y - 100 });
+                    if(imgData[(y * 400 + x) * 4] > 128) anviOffsets.push({ x: x - 200, y: y - 100 });
                 }
             }
         }
