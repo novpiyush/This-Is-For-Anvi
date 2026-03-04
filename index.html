@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Happy Holi - Ultimate Premium</title>
+    <title>I Made This Just For Palku</title>
     
     <!-- Premium Google Fonts for 3D Name -->
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&display=swap" rel="stylesheet">
@@ -110,10 +110,10 @@
         .interactive-item { cursor: pointer; transition: transform 0.2s; display: flex; flex-direction: column; align-items: center; gap: 10px; }
         .item-label { font-size: 0.9rem; color: #374151; font-weight: 600; background: rgba(255,255,255,0.7); padding: 5px 12px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
 
-        .css-gujiya, .css-ladoo, .css-rasgulla { transform-origin: center; }
+        .css-gujiya, .css-laddu, .css-rasgulla { transform-origin: center; }
         .css-gujiya { width: 70px; height: 35px; background: linear-gradient(135deg, #fcd34d, #d97706); border-radius: 40px 40px 0 0; box-shadow: inset 0 -5px 8px rgba(0,0,0,0.2), 0 8px 15px rgba(0,0,0,0.1); position: relative; }
         .css-gujiya::after { content: ''; position: absolute; bottom: 0; left: 8px; right: 8px; height: 5px; border-radius: 5px; background: rgba(255,255,255,0.4); }
-        .css-ladoo { width: 55px; height: 55px; background: radial-gradient(circle at 15px 15px, #fbbf24, #ea580c); border-radius: 50%; box-shadow: inset -6px -6px 12px rgba(0,0,0,0.3), 0 8px 15px rgba(0,0,0,0.1); border: 2px dashed rgba(255,255,255,0.2); }
+        .css-laddu { width: 55px; height: 55px; background: radial-gradient(circle at 15px 15px, #fbbf24, #ea580c); border-radius: 50%; box-shadow: inset -6px -6px 12px rgba(0,0,0,0.3), 0 8px 15px rgba(0,0,0,0.1); border: 2px dashed rgba(255,255,255,0.2); }
         .css-rasgulla { width: 55px; height: 55px; background: radial-gradient(circle at 15px 15px, #ffffff, #d1d5db); border-radius: 50%; box-shadow: inset -5px -5px 10px rgba(0,0,0,0.1), 0 8px 15px rgba(0,0,0,0.05); }
 
         .bite-anim { animation: biteShake 0.3s ease; }
@@ -186,11 +186,11 @@
     </div>
 
     <script>
-// === ALL 12 SECTIONS DATA ===
+        // === ALL 12 SECTIONS DATA ===
         const holiSections =[
-            { type: 'intro', title: 'Happy Holi', desc: 'I created this premium interactive experience just to bring a smile to your face. Let us begin!' },
-            { type: 'dj', title: 'Let The Music Play', desc: 'Holi is incomplete without beats. Tap start to load your music and begin the sequence!', centerHtml: `<div class="css-dj-desk"><div class="css-turntable" id="tt-1"><div class="css-vinyl-center"></div></div><div class="css-mixer"><div class="css-slider"></div><div class="css-slider"></div></div><div class="css-turntable" id="tt-2"><div class="css-vinyl-center" style="background: radial-gradient(circle, #0ea5e9, #0369a1);"></div></div></div>` },
-            { type: 'interact', title: 'Time For Sweets', desc: 'Tap the sweets to eat them all before moving on. Feel the crunch!', centerHtml: `<div class="interactive-item" onclick="consume('gujiya')"><div class="css-gujiya" id="gujiya" style="--s:1"></div><span class="item-label">Gujiya</span></div><div class="interactive-item" onclick="consume('ladoo')"><div class="css-ladoo" id="ladoo" style="--s:1"></div><span class="item-label">Ladoo</span></div><div class="interactive-item" onclick="consume('rasgulla')"><div class="css-rasgulla" id="rasgulla" style="--s:1"></div><span class="item-label">Rasgulla</span></div>` },
+            { type: 'intro', title: 'HAPPY HOLI PALKU', desc: 'I created this premium interactive experience just to bring a smile to your face. Let us begin!' },
+            { type: 'dj', title: 'Let The Music Play', desc: 'Tap start and let the music fill the air as colors gently begin to dance around you!', centerHtml: `<div class="css-dj-desk"><div class="css-turntable" id="tt-1"><div class="css-vinyl-center"></div></div><div class="css-mixer"><div class="css-slider"></div><div class="css-slider"></div></div><div class="css-turntable" id="tt-2"><div class="css-vinyl-center" style="background: radial-gradient(circle, #0ea5e9, #0369a1);"></div></div></div>` },
+            { type: 'interact', title: 'Time For Sweets', desc: 'Tap the sweets to eat them all before moving on. Feel the crunch!', centerHtml: `<div class="interactive-item" onclick="consume('gujiya')"><div class="css-gujiya" id="gujiya" style="--s:1"></div><span class="item-label">Gujiya</span></div><div class="interactive-item" onclick="consume('laddu')"><div class="css-laddu" id="laddu" style="--s:1"></div><span class="item-label">Laddu</span></div><div class="interactive-item" onclick="consume('rasgulla')"><div class="css-rasgulla" id="rasgulla" style="--s:1"></div><span class="item-label">Rasgulla</span></div>` },
             { type: 'interact', title: 'Refreshing Drinks', desc: 'Tap the glasses to drink up! Enjoy the refreshing feel.', centerHtml: `<div class="interactive-item" onclick="drink('thandai')"><div class="css-glass" id="glass-thandai"><div class="css-liquid liq-thandai" id="thandai"></div></div><span class="item-label">Thandai</span></div><div class="interactive-item" onclick="drink('milk')"><div class="css-glass" id="glass-milk"><div class="css-liquid liq-milk" id="milk"></div></div><span class="item-label">Milk</span></div>` },
             { type: 'interact', title: 'Pop Balloons', desc: 'Tap on these floating balloons to blast water colors directly on the screen!', centerHtml: `<div class="css-balloon-container" id="bal-1" onclick="popBalloon('bal-1', '#ef4444')" style="animation-delay: 0s"><div class="css-balloon" style="background: radial-gradient(circle at 15px 15px, #fca5a5, #ef4444); color: #ef4444;"></div><div class="css-string"></div></div><div class="css-balloon-container" id="bal-2" onclick="popBalloon('bal-2', '#3b82f6')" style="animation-delay: 0.5s"><div class="css-balloon" style="background: radial-gradient(circle at 15px 15px, #93c5fd, #3b82f6); color: #3b82f6;"></div><div class="css-string"></div></div><div class="css-balloon-container" id="bal-3" onclick="popBalloon('bal-3', '#eab308')" style="animation-delay: 1s"><div class="css-balloon" style="background: radial-gradient(circle at 15px 15px, #fde047, #eab308); color: #eab308;"></div><div class="css-string"></div></div>` },
             { type: 'play', mode: 'smear', time: 20, title: 'Colors Of Joy', desc: 'Smear dry colors on the screen with your finger. Tap Start to play!' },
@@ -203,7 +203,7 @@
             { type: 'bucket', mode: 'bucket', time: 30, title: 'Magical Bucket', desc: 'Swipe up on the balloons to throw them and print your magical name!' },
             
             // ORIGINAL FINAL SECTION 
-            { type: 'end', title: 'Stay Happy Forever', desc: 'I sincerely wish your life remains as beautiful and colorful as these moments. Happy Holi!' }
+            { type: 'end', title: 'Stay Happy Forever', desc: 'I sincerely wish your life remains as beautiful and colorful as these moments. Happy Holi Palku!' }
         ];
 
         let currentIdx = 0; let consumedCounts = {}; let isCanvasActive = false; let drawMode = 'none';
@@ -295,7 +295,7 @@
             let nGain = audioCtx.createGain(); nGain.gain.setValueAtTime(0.6, t); nGain.gain.exponentialRampToValueAtTime(0.01, t+0.2);
             noise.connect(filter); filter.connect(nGain); nGain.connect(audioCtx.destination); noise.start(t);
         }
-// === CENTER ITEMS INTERACTION LOGIC ===
+        // === CENTER ITEMS INTERACTION LOGIC ===
         function checkInteractComplete(type, req) {
             let completed = 0; for(let key in consumedCounts) { if(consumedCounts[key] >= req) completed++; }
             if(completed === ((type==='sweet')?3:((type==='drink')?2:3))) { showToastMessage("Awesome!"); setTimeout(transitionToNext, 1200); }
@@ -357,7 +357,7 @@
             }
         }
         document.fonts.ready.then(() => { generatePalkuOffsets(); });
-// === BUCKET BALLOON THROW LOGIC ===
+        // === BUCKET BALLOON THROW LOGIC ===
         function initBucketInteraction() {
             let db = document.getElementById('drag-balloon');
             let currentBColor = getNextBalloonColor();
@@ -527,7 +527,7 @@
             }
             requestAnimationFrame(drawLoop);
         } drawLoop();
-function executeDraw(x, y) {
+        function executeDraw(x, y) {
             if(!isCanvasActive || isWashing || drawMode === 'bucket') return;
             let c = colorPalette[Math.floor(Math.random() * colorPalette.length)]; 
             
@@ -630,7 +630,7 @@ function executeDraw(x, y) {
             centerStage.innerHTML = data.centerHtml || ''; cardContent.innerHTML = `<h2>${data.title}</h2><p>${data.desc}</p>`;
             
             if(data.type === 'intro') { btnAction.innerText = "Begin Experience"; btnAction.classList.add('visible'); } 
-            else if(data.type === 'dj') { btnAction.innerText = "Start Sequence"; btnAction.classList.add('visible'); }
+            else if(data.type === 'dj') { btnAction.innerText = "Start The Magic"; btnAction.classList.add('visible'); }
             else if(data.type === 'play') { btnAction.innerText = "Start Playing"; btnAction.classList.add('visible'); }
             else if(data.type === 'bucket') { btnAction.innerText = "Open Magic Bucket"; btnAction.classList.add('visible'); }
             else if(data.type === 'end') { 
@@ -644,4 +644,4 @@ function executeDraw(x, y) {
         loadSection(0);
     </script>
 </body>
-</html>        
+</html>
