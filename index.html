@@ -356,7 +356,7 @@
                 }
             }
         }
-        document.fonts.ready.then(() => { generatePalkuOffsets(); });
+        document.fonts.ready.then(() => { generateAnviOffsets(); });
         // === BUCKET BALLOON THROW LOGIC ===
         function initBucketInteraction() {
             let db = document.getElementById('drag-balloon');
@@ -415,7 +415,7 @@
             playPremiumBurst(); if(navigator.vibrate) navigator.vibrate([50, 40, 50]);
             let scale = 0.5 + Math.random() * 0.4; // Slightly varied sizes
             
-            for(let pt of palkuOffsets) {
+            for(let pt of anviOffsets) {
                 bucketParticles.push({
                     x: x + (Math.random()-0.5)*30, y: y + (Math.random()-0.5)*30,
                     tx: x + pt.x * scale, ty: y + pt.y * scale,
